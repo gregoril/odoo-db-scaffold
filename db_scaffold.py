@@ -1,6 +1,7 @@
 import psycopg2
 import sys
 import os
+import os.path
 
 
 CONN_STRING = "host=xxx.xxx.xxx.xxx dbname=xxxxxxx user=xxxxxxx password=xxxxxxx port=5432"
@@ -75,8 +76,7 @@ class """ + tname.replace(".","_") + """(models.Model):
     _auto = False
     _table = '""" + tname + """'  \n \n"""
 
-    security_text= """id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_""" + tname.replace(".","_")  +""",access_""" + tname.replace(".","_")  +""",""" + MODEL_NAME + """.model_""" + tname.replace(".","_")  +""",""" + GROUP_USER + """,1,0,0,0
+    security_text= """access_""" + tname.replace(".","_")  +""",access_""" + tname.replace(".","_")  +""",""" + MODEL_NAME + """.model_""" + tname.replace(".","_")  +""",""" + GROUP_USER + """,1,0,0,0
 manage_""" + tname.replace(".","_")  +""",manage_""" + tname.replace(".","_")  +""",""" + MODEL_NAME + """.model_""" + tname.replace(".","_")  +""",""" + GROUP_MANAGER + """,1,1,1,1
 """
     
@@ -173,10 +173,11 @@ manage_""" + tname.replace(".","_")  +""",manage_""" + tname.replace(".","_")  +
     f=file_object = open('results/__manifest_view.txt', 'a')
     f.write("'views/" + tname.replace(".","_") +"_view.xml',\n")
     f.close    
-    
-    f = open("results/security/" + tname.replace(".","_")+"_security.csv", "w+")
+    if not os.path.exists("results/security/ir.model.access.csv"):
+        f = open("results/security/ir.model.access.csv", "w")    
+        f.write("id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink")
+    else:
+        f = open("results/security/ir.model.access.csv", "a")
     f.write(security_text)
     f.close()
-    f=file_object = open('results/__manifest_security.txt', 'a')
-    f.write("'security/" + tname.replace(".","_") +"_security.csv',\n")
-    f.close    
+    
