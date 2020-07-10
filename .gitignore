@@ -1,6 +1,3 @@
-dev_settings.py
-
-
 ### VisualStudioCode ###
 .vscode/*
 #!.vscode/settings.json
@@ -143,3 +140,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+###################################################################
+#       Specific to project
+###################################################################
+
+dev_settings.py
+results/*
