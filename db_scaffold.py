@@ -9,8 +9,7 @@ MODEL_NAME = "mymodel"
 MODEL_LONG_NAME = "My Model"
 GROUP_USER = "mymodel.group_user"
 GROUP_MANAGER = "mymodel.group_manager"
-
-
+MODEL_PREFIX = ""
 try:
    from dev_settings import *
 except ImportError:
@@ -21,8 +20,8 @@ except ImportError:
 if not os.path.exists("results/models"):
     os.makedirs("results/models")
 
-if not os.path.exists("results/view"):
-    os.makedirs("results/view")
+if not os.path.exists("results/views"):
+    os.makedirs("results/views")
     
 if not os.path.exists("results/security"):
     os.makedirs("results/security")
@@ -30,14 +29,15 @@ if not os.path.exists("results/security"):
     
     
 conn = psycopg2.connect(CONN_STRING)
+tfilter = "%"
 if len(sys.argv) <2 :
     print ('usage: py db_scaffold.py <table pattern> \n eg.  py db_scaffold.py customers%    <- scaffold all tables whose name start with customers')
     sys.exit()
 else:
     tfilter = sys.argv[1]
     print(tfilter)
-tfilter = "valuta%"
-t= """select table_name from information_schema.tables where table_name like '""" + tfilter +"""' """
+
+t= """select table_name from information_schema.tables where table_schema like 'public' and  table_name like '""" + tfilter +"""' order by 1"""
 cur_t = conn.cursor()
 cur_t.execute(t)
 tbls = cur_t.fetchall()
@@ -58,6 +58,7 @@ for tbl in tbls:
     WHERE table_name = '""" + tname + "';"
 
     print (q)
+    tname=MODEL_PREFIX+tname
     cur = conn.cursor()
     cur.execute(q, ('BADGES_SFR',))  # (table_name,) passed as tuple
     fields = cur.fetchall()
@@ -123,6 +124,8 @@ manage_""" + tname.replace(".","_")  +""",manage_""" + tname.replace(".","_")  +
             module_text += "fields.Char("
         elif (f[1] == "text"):
             module_text += "fields.Text("
+        elif (f[1] == "json"):
+            module_text += "fields.Text("
         elif (f[1] == "date"):
                 module_text += "fields.Date("
         elif (f[1] == "integer"):
@@ -163,11 +166,11 @@ manage_""" + tname.replace(".","_")  +""",manage_""" + tname.replace(".","_")  +
     f = open("results/models/" + tname.replace(".","_")+".py", "w+")
     f.write(module_text)
     f.close()
-    f= file_object = open('results/model/__init__.py', 'a')
+    f= file_object = open('results/models/__init__.py', 'a')
     f.write("from . import " + tname.replace(".","_") + "\n")
     f.close    
     
-    f = open("results/view/" + tname.replace(".","_")+"_view.xml", "w+")
+    f = open("results/views/" + tname.replace(".","_")+"_view.xml", "w+")
     f.write(view_text)
     f.close()
     f=file_object = open('results/__manifest_view.txt', 'a')
