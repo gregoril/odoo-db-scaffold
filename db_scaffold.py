@@ -42,6 +42,8 @@ cur_t = conn.cursor()
 cur_t.execute(t)
 tbls = cur_t.fetchall()
 
+ft_sql=""
+
 for tbl in tbls:
     tname = tbl[0]  
     q = """                              
@@ -53,12 +55,12 @@ for tbl in tbls:
             WHERE
                 c.oid = (SELECT ('"' || cols.table_name || '"')::regclass::oid)
                 AND c.relname = cols.table_name
-        ) AS column_comment
+        ) AS column_comment, udt_name
     FROM information_schema.columns cols
     WHERE table_name = '""" + tname + "';"
 
     print (q)
-    tname=MODEL_PREFIX+tname
+    tname=MODEL_PREFIX+"_"+tname
     cur = conn.cursor()
     cur.execute(q, ('BADGES_SFR',))  # (table_name,) passed as tuple
     fields = cur.fetchall()
@@ -115,9 +117,10 @@ manage_""" + tname.replace(".","_")  +""",manage_""" + tname.replace(".","_")  +
             groups=\"""" + GROUP_MANAGER + """\"
         />
 """
-
+    ft_sql += "CREATE FOREIGN TABLE " + tname + " ("
     for f in fields:
         print (f[0], f[1], f[3])
+        ft_sql += "\n    " + f[0] + " \t" + f[1] + "," 
         label = (f[3] or f[0]).replace('\'','\'\'')
         module_text = module_text + "\n    " + f[0] + "="
         if (f[1] == "character varying"):
@@ -147,6 +150,9 @@ manage_""" + tname.replace(".","_")  +""",manage_""" + tname.replace(".","_")  +
         module_text += ")"
 
         form_tree = form_tree.replace("#######", "\t\t\t\t<field name = \"" + f[0] + "\" />\n#######")
+
+    ft_sql = ft_sql[:-1]
+    ft_sql += ")\nSERVER " + MODEL_PREFIX +"db OPTIONS (schema_name 'public', table_name '" + tbl[0] +"');\n "
 
     form_tree = form_tree.replace("#######", "\n")
 
@@ -184,3 +190,6 @@ manage_""" + tname.replace(".","_")  +""",manage_""" + tname.replace(".","_")  +
     f.write(security_text)
     f.close()
     
+f = open("results/foreign_tables.sql", "w+")
+f.write(ft_sql)
+f.close()
