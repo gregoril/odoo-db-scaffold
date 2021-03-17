@@ -10,6 +10,7 @@ MODEL_LONG_NAME = "My Model"
 GROUP_USER = "mymodel.group_user"
 GROUP_MANAGER = "mymodel.group_manager"
 MODEL_PREFIX = ""
+BASE_PATH = "./" #remember final /
 try:
    from dev_settings import *
 except ImportError:
@@ -17,14 +18,14 @@ except ImportError:
     sys.exit()
     pass
 
-if not os.path.exists("results/models"):
-    os.makedirs("results/models")
+if not os.path.exists(BASE_PATH+"results/models"):
+    os.makedirs(BASE_PATH+"results/models")
 
-if not os.path.exists("results/views"):
-    os.makedirs("results/views")
+if not os.path.exists(BASE_PATH+"results/views"):
+    os.makedirs(BASE_PATH+"results/views")
     
-if not os.path.exists("results/security"):
-    os.makedirs("results/security")
+if not os.path.exists(BASE_PATH+"results/security"):
+    os.makedirs(BASE_PATH+"results/security")
     
     
     
@@ -60,7 +61,7 @@ for tbl in tbls:
     WHERE table_name = '""" + tname + "';"
 
     print (q)
-    tname=MODEL_PREFIX+"_"+tname
+    tname=MODEL_PREFIX+tname
     cur = conn.cursor()
     cur.execute(q, ('BADGES_SFR',))  # (table_name,) passed as tuple
     fields = cur.fetchall()
@@ -169,27 +170,27 @@ manage_""" + tname.replace(".","_")  +""",manage_""" + tname.replace(".","_")  +
 
 
     print (view_text)
-    f = open("results/models/" + tname.replace(".","_")+".py", "w+")
+    f = open(BASE_PATH+"results/models/" + tname.replace(".","_")+".py", "w+")
     f.write(module_text)
     f.close()
-    f= file_object = open('results/models/__init__.py', 'a')
+    f= file_object = open(BASE_PATH+"results/models/__init__.py", "a")
     f.write("from . import " + tname.replace(".","_") + "\n")
     f.close    
     
-    f = open("results/views/" + tname.replace(".","_")+"_view.xml", "w+")
+    f = open(BASE_PATH+"results/views/" + tname.replace(".","_")+"_view.xml", "w+")
     f.write(view_text)
     f.close()
-    f=file_object = open('results/__manifest_view.txt', 'a')
+    f=file_object = open(BASE_PATH+"results/__manifest_view.txt", "a")
     f.write("'views/" + tname.replace(".","_") +"_view.xml',\n")
     f.close    
-    if not os.path.exists("results/security/ir.model.access.csv"):
-        f = open("results/security/ir.model.access.csv", "w")    
+    if not os.path.exists(BASE_PATH+"results/security/ir.model.access.csv"):
+        f = open(BASE_PATH+"results/security/ir.model.access.csv", "w")    
         f.write("id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink")
     else:
-        f = open("results/security/ir.model.access.csv", "a")
+        f = open(BASE_PATH+"results/security/ir.model.access.csv", "a")
     f.write(security_text)
     f.close()
     
-f = open("results/foreign_tables.sql", "w+")
+f = open(BASE_PATH+"results/foreign_tables.sql", "w+")
 f.write(ft_sql)
 f.close()
