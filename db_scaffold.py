@@ -112,6 +112,28 @@ manage_""" + tname.replace(".", "_") + """,manage_""" + tname.replace(".", "_") 
                 </field>
             </record>
     """
+    form_form = """
+<!-- """ + tname.replace(".", "_") + """ form -->
+            <record id=\"""" + tname.replace(".", "_") + """_form" model="ir.ui.view">
+                <field name="name">""" + MODEL_LONG_NAME + " " + tname.replace(".", " ") + """ form</field>
+                <field name="model">""" + tname + """</field>
+                <field name="arch" type="xml">
+                     <form string="Dati ">
+                     <header>
+                     </header>
+                     <sheet>
+                        #######
+                        <navigation>
+                        <page>
+                        </page>
+                        </navigation>
+                    <sheet>
+                    </form>
+
+                </field>
+            </record>
+    """
+
 
     form_menu = """
         <!-- """ + tname.replace(".", "_") + """ action -->
@@ -185,7 +207,7 @@ manage_""" + tname.replace(".", "_") + """,manage_""" + tname.replace(".", "_") 
             form_tree = form_tree.replace(
                 "#######", "\t\t\t\t<field name = \"" + f[0] + widget + "\" />\n#######")
             form_search = form_search.replace(
-                "#######", "\t\t\t\t<field name = \"" + f[0] + widget + "\" />\n#######")
+                "#######", "\t\t\t\t<field name = \"" + f[0] + "\" />\n#######")
             form_form = form_search.replace(
                 "#######", "\t\t\t\t<field name = \"" + f[0] + widget + "\" />\n#######")
 
@@ -202,9 +224,9 @@ manage_""" + tname.replace(".", "_") + """,manage_""" + tname.replace(".", "_") 
     view_text = """<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        """ + form_form + """
         """ + form_tree + """
         """ + form_search + """
-        """ + form_form + """
         """ + form_menu + """
 
     </data>
