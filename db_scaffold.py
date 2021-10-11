@@ -233,7 +233,8 @@ manage_""" + tname.replace(".", "_") + """,manage_""" + tname.replace(".", "_") 
         f = open(BASE_PATH+"results/security/ir.model.access.csv", "a")
     f.write(security_text)
     f.close()
+    
+    f = open(BASE_PATH+"results/foreign_tables.sql", "w+")
+    f.write(ft_sql)
+    f.close()
 
-f = open(BASE_PATH+"results/foreign_tables.sql", "w+")
-f.write(ft_sql)
-f.close()
